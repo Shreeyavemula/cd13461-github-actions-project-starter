@@ -94,6 +94,9 @@ jobs:
       - name: Install sharp
         run: npm rebuild sharp
 
+      - name: Install compatible Pagefind
+        run: npm install pagefind@1.5.2 --no-save
+
       - name: Build static pages
         env:
           PATH_PREFIX: /${{ github.event.repository.name }}/
