@@ -66,7 +66,6 @@ jobs:
     permissions:
       contents: read
       pages: write
-      id-token: write
 
     steps:
       - name: Checkout repository
@@ -134,11 +133,15 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Create deployment issue
         if: always()
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEPLOYMENT_URL: ${{ steps.deployment.outputs.page_url || format('https://{0}.github.io/{1}/', github.repository_owner, github.event.repository.name) }}
-          DEPLOYMENT_STATUS: ${{ job.status }}
+          DEPLOYMENT_STATUS: ${{ steps.deployment.outcome == 'success' && 'succeeded' || 'failed' }}
         run: |
           gh issue create             --title "$(date +'%Y-%m-%d') - Deployment: ${DEPLOYMENT_STATUS}"             --body "URL: ${DEPLOYMENT_URL}"
